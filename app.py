@@ -1,50 +1,63 @@
 import streamlit as st
 from streamlit_modal import Modal
-
+from utils import *
 
 def main():
-    st.title('Today Recap')
-    col_enter_api, col_welcome = st.columns([1, 1])
-    with col_enter_api:
-        if 'api_key' not in st.session_state:
-            st.session_state['api_key'] = ''
+    # Init
+    st.title('Today\'news on VNExpress Recap')
+    models_avaiable = list_of_model()
+    model = ''
 
-        # Create the modal
-        modal = Modal("Set Gemini API Key", key="api_key_modal")
+    model_selection_col, recap_col = st.columns([1, 1])
 
-        open_modal = st.button("Set Gemini API Key")
+    if 'model_selection' not in st.session_state:
+        st.session_state['model_selection'] = ''
+    # Model selection
+    with model_selection_col:
+
+        modal = Modal("Choose a model", key="model_selection")
+
+        open_modal = st.button("Choose a model")
         if open_modal:
             modal.open()
 
         if modal.is_open():
+            
             with modal.container():
-                st.write(
-                    "[Click to see how to get gemini API key](https://aistudio.google.com/app/apikey)")
-                text = st.text_input('Enter gemini key:', key="modal_input")
+                option = st.selectbox(
+                "Choose a model. If no option to select, please pull the model from ollama",
+                models_avaiable,
+                )
+                model_selected = client.models.retrieve(option)
 
-                # Modified button handling
                 if st.button("Save and Close", key="save_close_btn"):
                     # Save the text to session state
-                    st.session_state['api_key'] = text
-                    # Close the modal
+                    st.session_state['model_selection'] = model_selected
                     modal.close()
 
-        gemini_api_key = ''
-        if st.session_state['api_key']:
-            gemini_api_key = st.session_state["api_key"]
-            st.success(
-                f"Current API Key: {st.session_state.api_key[:4]}******")
+    if st.session_state['model_selection']:
+        model = st.session_state["model_selection"]
+        st.success(f"Your choice: {st.session_state['model_selection'].id}")
 
-    with col_welcome:
-        st.write("Description...")
-
-    recap_btn = st.button("Recap Today's Meeting")
-
-    if recap_btn and gemini_api_key:
-        st.write("Recap button clicked and API key is set.")
-    else:
-        st.warning("Please set your Gemini API key first.")
-
+    # Recap button
+    with recap_col:
+        recap_btn = st.button("Recap Today's News")
+        keyword = st.text_input('Enter the keyword')
+    if recap_btn and model == '' and keyword == '':
+        st.warning('Please choose a model and enter a keyword first')
+    elif recap_btn and model == '':
+        st.warning('Please choose a model')
+    elif recap_btn and keyword == '':
+        st.warning('Please enter a keyword')
+    elif recap_btn:
+        st.success('Waiting for today recap..')
+        urls = search_vnexpress(keyword)
+        st.success(f'Found {len(urls)} news today about {keyword}')
+        for url in urls:
+            title, content = fetch_news_content(url)
+            st.write(f':blue[{title}]')
+            summary_content = summary(content)
+            st.write(summary_content)
 
 if __name__ == "__main__":
     main()
