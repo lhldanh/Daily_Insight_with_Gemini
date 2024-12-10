@@ -1,3 +1,5 @@
 openai
 streamlit
 streamlit_modal
+request
+bs4
