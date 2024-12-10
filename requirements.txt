@@ -1,5 +1,5 @@
 openai
 streamlit
 streamlit_modal
-request
+requests
 bs4
