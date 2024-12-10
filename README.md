@@ -4,7 +4,7 @@ This application recap today's news on VNExpress
 ## 1. Installation
 ### 1. Install Libraries
 ```python
-pip install -r requirements. txt
+pip install -r requirements.txt
 ```
 ### 2. Install Ollama
 - [Ollama](https://ollama.com/download) should be installed and running
