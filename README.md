@@ -1,6 +1,5 @@
 # Daily_Insight_with_Llama
 Staying Informed in A Fast-paced World
-This application recap today's news on VNExpress
 ## 1. Installation
 ### 1. Install Libraries
 ```python
